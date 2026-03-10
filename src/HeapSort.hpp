@@ -12,17 +12,13 @@ public:
 
   const char *getAlgorithmName() const override { return "HeapSort"; }
 
-  // Podstawowa klasyczna część sortująca na kopcach podawana pod dowolny
-  // zakres:
   static void heapSortInternal(T *table, int left, int right) {
     int n = right - left + 1;
 
-    // 1. Budowanie kopca
     for (int i = n / 2 - 1; i >= 0; i--) {
-      heapify(table, n, i, left); // Przekazujemy offset tablicowy
+      heapify(table, n, i, left);
     }
 
-    // 2. Wyciąganie "szczytu" po jednym elemencie
     for (int i = n - 1; i > 0; i--) {
       T tmp = table[left];
       table[left] = table[left + i];
