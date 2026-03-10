@@ -4,6 +4,12 @@
 # Ignoruj folder z wynikami benchmarków
 /results/
 
+# Ignoruj folder z wykresami wyników
+/plots/
+
+# Ignoruj wirtualne środowisko python
+/scripts/.venv/
+
 # Ignoruj pliki wykonywalne
 *.exe
 *.dll
