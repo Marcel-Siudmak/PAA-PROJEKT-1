@@ -44,26 +44,27 @@ Aby zbudować projekt, wykonaj poniższe kroki w terminalu:
 │   ├── main.cpp
 │   ├── ISort.hpp
 │   ├── MergeSort.hpp
-│   ├── MergeSort.cpp
 │   ├── QuickSort.hpp
-│   ├── QuickSort.cpp
+│   ├── InsertionSort.hpp
+│   ├── HeapSort.hpp
 │   ├── IntroSort.hpp
-│   ├── IntroSort.cpp
 │   ├── Menu.hpp
 │   ├── Menu.cpp
-│   ├── Benchmark.hpp
-│   ├── Benchmark.cpp
+│   ├── ManualTester.hpp
+│   ├── ManualTester.cpp
+│   ├── Benchmarks.hpp
+│   ├── Benchmarks.cpp
 │   ├── DataHandler.hpp
 │   └── DataHandler.cpp
-├── data/
-│   ├── random_data_5000.txt
-│   ├── random_data_10000.txt
+├── results/
+│   ├── random.csv
+│   ├── reverse.csv
 │   └── ... 
 ├── build/
-│   ├── binary
+│   ├── paa_projekt_1
 │   └── ...
 ├── CMakeLists.txt
-└── README.md
+└── readme.md
 ```
 
 
@@ -77,41 +78,46 @@ Abstrakcyjna klasa bazowa (interfejs) wykorzystująca szablony (**templates**). 
 ### B. Algorytmy Sortowania (Moduły implementacyjne)
 
 #### `MergeSort`
-`MergeSort.hpp` / `MergeSort.cpp` – Implementacja algorytmu sortowania przez scalanie. Moduł realizuje strategię „dziel i zwyciężaj”, zapewniając stabilność sortowania i złożoność $O(n \log n)$.
+`MergeSort.hpp` – Implementacja algorytmu sortowania przez scalanie bazująca na `ISort<T>`. Moduł realizuje strategię „dziel i zwyciężaj”, zapewniając stabilność sortowania i niezawodną złożoność $O(n \log n)$.
 
 #### `QuickSort`
-`QuickSort.hpp` / `QuickSort.cpp` – Implementacja sortowania szybkiego. Moduł zawiera logikę partycjonowania tablicy względem elementu osiowego (pivot). Jest to kluczowy algorytm dla uzyskania oceny 4.0+.
+`QuickSort.hpp` – Implementacja sortowania szybkiego bazująca na `ISort<T>`. Algorytm wykorzystuje publiczny silnik partycjonowania tablicy względem elementu osiowego (pivot) wzbogacony o optymalizację Median-of-Three (Mediana z trzech).
+
+#### `InsertionSort` i `HeapSort`
+`InsertionSort.hpp` / `HeapSort.hpp` – Dwie dodatkowe metody sortowania pod spodem `ISort<T>`. InsertionSort używany jest do niesamowicie szybkiego, liniowego układania małych list (np. używając Cache'a klastra procesora). HeapSort wykorzystuje naprawę Kopca Binarnego i chroni przed przepięciami rekursji. Przechowują publiczne funkcje statyczne do sortowania we wskazanych zasięgach podprzestrzeni (od lewej do prawej).
 
 #### `IntroSort`
-`IntroSort.hpp` / `IntroSort.cpp` – Implementacja sortowania introspektywnego. Algorytm hybrydowy, który zaczyna od QuickSort, a w przypadku zbyt dużej głębokości rekurencji przełącza się na HeapSort, co gwarantuje złożoność $O(n \log n)$ nawet w przypadku pesymistycznym.
+`IntroSort.hpp` – Implementacja wielomodułowego i hybrydowego sortowania introspektywnego. Rdzeń klasy to system warunkujący zaciągający powyższe implementacje klocków (`InsertionSort`, `HeapSort`, i `QuickSort::partition`). Gwarantuje piorunującą szybkość dla dobrych przypadków i limituje glebokość w $O(n \log n)$ dla przypadków oszukanych i pesymistycznych.
 
 ### C. Logika Aplikacji i Interfejs Użytkownika
 
 #### `Menu`
-`Menu.hpp` / `Menu.cpp` – Warstwa prezentacji. Moduł odpowiada za interakcję z użytkownikiem, wybór typu danych, rozmiaru tablicy oraz algorytmu. Pozwala na ręczne uruchomienie testów i weryfikację poprawności (walidację) sortowania na małych zbiorach.
+`Menu.hpp` / `Menu.cpp` – Warstwa prezentacji, główne powitanie, z którego uruchamia się odrębne testy.
+
+#### `ManualTester`
+`ManualTester.hpp` / `ManualTester.cpp` - Submoduł konsoli służący do swobodnego, ręcznego rzucania wybranymi algorytmami sortującymi na krótkotrwałych testach wprowadzanych z klawiatury użytkownika. 
 
 #### `main.cpp`
-Punkt startowy programu. Odpowiada za stworzenie instancji klasy `Menu` i uruchomienie jej głównej pętli. Nie zawiera logiki biznesowej, a jedynie inicjalizuje aplikację.
+Punkt startowy programu. Odpowiada wyłącznie za stworzenie instancji klasy `Menu` i pobudzenie do życia w pętli UI.
 
 ### D. Narzędzia Badawcze i Zarządzanie Danymi
 
 #### `DataHandler`
-`DataHandler.hpp` / `DataHandler.cpp` – Moduł narzędziowy do przygotowania zestawów danych. Zawiera funkcje generujące tablice o zadanych parametrach:
-* Całkowicie losowe,
-* Częściowo posortowane (25%, 50%, 75%, 95%, 99%, 99.7%),
-* Posortowane odwrotnie.
-Obsługuje również zapis i odczyt tych danych z plików `.txt`.
+`DataHandler.hpp` / `DataHandler.cpp` – Moduł narzędziowy będący fabryką danych w formacie generowania `std::vector<int>`. W zaleźności od wezwania "wypluwa" tablicę:
+* Całkowicie losową,
+* Częściowo posortowaną z idealnie dopasowanym procentem przedziału początkowego,
+* Posortowaną od największej do najmniejszej (Reverse).
 
-#### `Benchmark`
-`Benchmark.hpp` / `Benchmark.cpp` – Serce części badawczej. Wykorzystuje bibliotekę `<chrono>` do precyzyjnego pomiaru czasu (mikrosekundy/nanosekundy). Automatyzuje proces testowy: przeprowadza 100 powtórzeń dla każdego rozmiaru tablicy (10k, 50k, 100k, 500k, 1M) i oblicza średni czas wykonania.
+#### `Benchmarks`
+`Benchmarks.hpp` / `Benchmarks.cpp` – Niezależne serce części badawczej i pomiarowej o rygorystycznych ograniczeniach dla środowiska roboczego. Dynamicznie, dla mniejszych zakresów, zwalnia i przydziela w pamięci macierze (chroniąc system RAM operacyjny przez uduszeniem) pod czułym okiem `std::chrono`. Wykonuje serię posortowań każdej z klas na setkach tablic pod presją badawczą i generuje wyniki statystyczne do odczytu w `.csv`. Dodatkowo, posiada wbudowany licznik walidacyjny `isSorted`, który testuje każdy produkt tablicowy, zapalając "FAILED" na ekranie benchmarku w trybie runtime.
 
 ### E. Pozostałe Elementy Projektu
 
-#### `data/` (Katalog danych)
-Folder przechowujący fizyczne pliki `.txt` z wygenerowanymi zestawami liczb. Zapewnia to, że każdy algorytm jest testowany na identycznych danych wejściowych, co jest niezbędne do rzetelnej analizy porównawczej.
+#### `results/` (Katalog danych)
+Folder docelowy, zbierający zautomatyzowane logi i raporty odzwierciedlające obciążenie czasowe wygenerowane z uruchomienia Menu -> 2. Benchmark. Gotowe `.csv` do użycia w arkuszu. Zastępuje stary folder ręcznych txt z tablicami.
 
 #### `build/` (Katalog kompilacji)
-Katalog roboczy generowany przez CMake. Przechowuje plik wykonywalny oraz pliki obiektowe. Jest on ignorowany przez system kontroli wersji.
+Katalog roboczy generowany przez wbudowany ustrój. Przechowuje binarne pliki egzekutora `paa_projekt_1` powstałe po wpisaniu komendy `cmake --build .`. Ignorowany przez system git dla lekkości repozytorium.
 
 #### `CMakeLists.txt` (Konfiguracja)
 Plik sterujący procesem budowania projektu. Określa standard **C++20**, flagi optymalizacyjne kompilatora (np. `-O3`) oraz definiuje sposób łączenia plików źródłowych w plik wykonywalny.

@@ -21,7 +21,7 @@ add_executable(paa_projekt_1 ${SOURCES})
 
 # 7. Automatyczne kopiowanie folderu 'data' do folderu 'build'
 # Dzięki temu program zawsze znajdzie pliki tekstowe w folderze "data/" obok pliku .exe
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+# file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 # 8. Flagi ostrzeżeń (Warnings) - pomagają wyłapać błędy w kodzie na etapie kompilacji
 if(MSVC)
