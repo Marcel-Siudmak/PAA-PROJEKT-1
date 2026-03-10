@@ -17,6 +17,9 @@ template <typename T> const char *MergeSort<T>::getAlgorithmName() const {
 
 template <typename T>
 void MergeSort<T>::mergeSort(T *table, int left, int right, T *buffer) {
+  if (left >= right)
+    return;
+
   int middle = left + (right - left) / 2;
 
   mergeSort(table, left, middle, buffer);
@@ -38,7 +41,7 @@ void MergeSort<T>::merge(T *table, int left, int mid, int right, T *buffer) {
       buffer[k++] = table[j++];
   }
 
-  while (i < mid)
+  while (i <= mid)
     buffer[k++] = table[i++];
 
   while (j <= right)
