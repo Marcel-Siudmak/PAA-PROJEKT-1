@@ -22,6 +22,7 @@ private:
     quickSortInternal(table, pivotIndex + 1, right);
   }
 
+public:
   static int partition(T *table, int left, int right) {
     // --- Algorytm Median-Of-Three (Mediana z trzech) ---
     // Wybieramy trzy elementy (pierwszy, środek i ostatni) i ustawiamy je tak,

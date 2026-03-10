@@ -1,5 +1,6 @@
 #include "Benchmarks.hpp"
 #include "DataHandler.hpp"
+#include "IntroSort.hpp"
 #include "MergeSort.hpp"
 #include "QuickSort.hpp"
 #include <chrono>
@@ -41,8 +42,8 @@ void Benchmarks::runFullBenchmark() {
     std::ofstream file("../results/" + configName + ".csv");
     if (!file.is_open())
       file.open("results/" + configName + ".csv");
-    file
-        << "RozmiarTablicy;SredniCzas_MergeSort[ms];SredniCzas_QuickSort[ms]\n";
+    file << "RozmiarTablicy;SredniCzas_MergeSort[ms];SredniCzas_QuickSort[ms];"
+            "SredniCzas_IntroSort[ms]\n";
     file.close();
   }
 
@@ -82,12 +83,15 @@ void Benchmarks::testConfig(const std::string &configName, int numArraysToTest,
 
   double totalMergeTime = 0;
   double totalQuickTime = 0;
+  double totalIntroTime = 0;
 
   bool mergeFailed = false;
   bool quickFailed = false;
+  bool introFailed = false;
 
   MergeSort<int> mergeSorter;
   QuickSort<int> quickSorter;
+  IntroSort<int> introSorter;
 
   for (int i = 0; i < numArraysToTest; i++) {
     // 1. Zamiast ładować wszystko na raz jak poprzednio, program generuje TYLKO
@@ -128,6 +132,18 @@ void Benchmarks::testConfig(const std::string &configName, int numArraysToTest,
       quickFailed = true;
     }
 
+    // --- 3. IntroSort Test ---
+    std::vector<int> dataForIntro = DataHandler::copyData(sampleArray);
+    start = std::chrono::high_resolution_clock::now();
+    introSorter.sort(dataForIntro.data(), dataForIntro.size());
+    end = std::chrono::high_resolution_clock::now();
+    totalIntroTime +=
+        std::chrono::duration<double, std::milli>(end - start).count();
+
+    if (!isSorted(dataForIntro)) {
+      introFailed = true;
+    }
+
     // Na koniec pojedynczej iteracji pętli `sampleArray`, `dataForMerge` i
     // `dataForQuick` usuwają się z pamięci i robią czyste miejsce dla
     // wygenerowania nowej tablicy na kolejną iterację i.
@@ -138,12 +154,15 @@ void Benchmarks::testConfig(const std::string &configName, int numArraysToTest,
   double averageMergeTime = totalMergeTime / numArraysToTest;
   double averageQuickTime =
       (totalQuickTime < 0) ? -1 : (totalQuickTime / numArraysToTest);
+  double averageIntroTime = totalIntroTime / numArraysToTest;
 
   // Raportowanie na ekran tego co wyszło w benchmarku obydwóm algorytmom:
   std::cout << "     MergeSort: " << (mergeFailed ? "FAILED" : "PASSED") << " ("
             << averageMergeTime << " ms) \n";
   std::cout << "     QuickSort: " << (quickFailed ? "FAILED" : "PASSED") << " ("
             << averageQuickTime << " ms) \n";
+  std::cout << "     IntroSort: " << (introFailed ? "FAILED" : "PASSED") << " ("
+            << averageIntroTime << " ms) \n";
 
   // Zapis do CSV
   std::string path = "../results/" + configName + ".csv";
@@ -153,7 +172,8 @@ void Benchmarks::testConfig(const std::string &configName, int numArraysToTest,
 
   if (file.is_open()) {
     file << std::fixed << std::setprecision(4) << arraySize << ";"
-         << averageMergeTime << ";" << averageQuickTime << "\n";
+         << averageMergeTime << ";" << averageQuickTime << ";"
+         << averageIntroTime << "\n";
     file.close();
   } else {
     std::cout << "\n [BLAD!] Nie mozna bylo zapisac linijki do CSV: " << path
