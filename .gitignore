@@ -9,3 +9,6 @@
 *.dll
 *.so
 *.class
+
+# Ignoruj pliki .csv
+*.csv
