@@ -1,6 +1,9 @@
 # Ignoruj folder z plikami binarnymi
 /build/
 
+# Ignoruj folder z wynikami benchmarków
+/results/
+
 # Ignoruj pliki wykonywalne
 *.exe
 *.dll
