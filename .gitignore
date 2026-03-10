@@ -1,0 +1,8 @@
+# Ignoruj folder z plikami binarnymi
+/build/
+
+# Ignoruj pliki wykonywalne
+*.exe
+*.dll
+*.so
+*.class
