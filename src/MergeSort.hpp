@@ -15,7 +15,6 @@ public:
   const char *getAlgorithmName() const override { return "MergeSort"; }
 
 private:
-  // Zmieniamy metody prywatne na statyczne
   static void mergeSortInternal(T *table, int left, int right, T *buffer) {
     if (left >= right)
       return;
@@ -51,7 +50,6 @@ private:
   }
 };
 
-// Globalna funkcja pomocnicza do "eleganckiego" wywoływania
 template <typename T> inline void mergeSort(T *table, int size) {
   MergeSort<T>().sort(table, size);
 }
