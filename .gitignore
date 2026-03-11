@@ -7,6 +7,9 @@
 # Ignoruj folder z wykresami wyników
 /plots/
 
+# Ignoruj folder z tabelami wyników
+/tables/
+
 # Ignoruj wirtualne środowisko python
 /scripts/.venv/
 
