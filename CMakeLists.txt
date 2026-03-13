@@ -23,7 +23,14 @@ add_executable(paa_projekt_1 ${SOURCES})
 # Dzięki temu program zawsze znajdzie pliki tekstowe w folderze "data/" obok pliku .exe
 # file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-# 8. Flagi ostrzeżeń (Warnings) - pomagają wyłapać błędy w kodzie na etapie kompilacji
+# 8. Optymalizacja -O3 dla trybu Release
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -flto -funroll-loops -DNDEBUG")
+
+# 9. Flagi ostrzeżeń (Warnings) - pomagają wyłapać błędy w kodzie na etapie kompilacji
 if(MSVC)
     target_compile_options(paa_projekt_1 PRIVATE /W4)
 else()

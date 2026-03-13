@@ -1,5 +1,7 @@
 #pragma once
 #include "ISort.hpp"
+#include "InsertionSort.hpp"
+#include <algorithm>
 
 template <typename T> class MergeSort : public ISort<T> {
 public:
@@ -19,34 +21,47 @@ private:
     if (left >= right)
       return;
 
+    // Cutoff do InsertionSort dla małych podtablic — eliminuje overhead
+    // rekursji i merge'a, InsertionSort jest szybszy dla n < 16
+    if (right - left < 16) {
+      InsertionSort<T>::insertionSortInternal(table, left, right);
+      return;
+    }
+
     int middle = left + (right - left) / 2;
 
     mergeSortInternal(table, left, middle, buffer);
     mergeSortInternal(table, middle + 1, right, buffer);
 
+    // Pominięcie merge gdy dane już posortowane naturalnie — ogromne
+    // przyspieszenie na danych częściowo posortowanych
+    if (table[middle] <= table[middle + 1])
+      return;
+
     mergeInternal(table, left, middle, right, buffer);
   }
 
   static void mergeInternal(T *table, int left, int mid, int right, T *buffer) {
+    // Kopiujemy do bufora za pomocą std::copy (kompilator wektoryzuje)
+    std::copy(table + left, table + right + 1, buffer + left);
+
     int i = left;
     int j = mid + 1;
     int k = left;
 
     while (i <= mid && j <= right) {
-      if (table[i] <= table[j])
-        buffer[k++] = table[i++];
+      if (buffer[i] <= buffer[j])
+        table[k++] = std::move(buffer[i++]);
       else
-        buffer[k++] = table[j++];
+        table[k++] = std::move(buffer[j++]);
     }
 
+    // Kopiujemy resztę lewej połówki (prawa już jest na miejscu w table)
     while (i <= mid)
-      buffer[k++] = table[i++];
+      table[k++] = std::move(buffer[i++]);
 
-    while (j <= right)
-      buffer[k++] = table[j++];
-
-    for (int idx = left; idx <= right; idx++)
-      table[idx] = buffer[idx];
+    // Reszta prawej połówki jest już na właściwych pozycjach w table
+    // — nie trzeba jej kopiować (j..right to oryginalne pozycje)
   }
 };
 

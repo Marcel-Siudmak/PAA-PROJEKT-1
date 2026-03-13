@@ -1,5 +1,7 @@
 #pragma once
 #include "ISort.hpp"
+#include "InsertionSort.hpp"
+#include <algorithm>
 
 template <typename T> class QuickSort : public ISort<T> {
 public:
@@ -14,59 +16,59 @@ public:
 
 private:
   static void quickSortInternal(T *table, int left, int right) {
-    if (left >= right)
-      return;
+    // Tail-call elimination: sortujemy mniejszą partycję rekursyjnie,
+    // a większą w pętli while. Ogranicza głębokość stosu do O(log n).
+    while (left < right) {
+      // Cutoff do InsertionSort dla małych podtablic
+      if (right - left < 16) {
+        InsertionSort<T>::insertionSortInternal(table, left, right);
+        return;
+      }
 
-    int pivotIndex = partition(table, left, right);
-    quickSortInternal(table, left, pivotIndex - 1);
-    quickSortInternal(table, pivotIndex + 1, right);
+      int p = partition(table, left, right);
+
+      // Rekursja na mniejszą partycję, pętla na większą
+      // Hoare partition: podział na [left..p] i [p+1..right]
+      if (p - left < right - p) {
+        quickSortInternal(table, left, p);
+        left = p + 1;
+      } else {
+        quickSortInternal(table, p + 1, right);
+        right = p;
+      }
+    }
   }
 
 public:
+  // --- Hoare Partition z Median-of-Three ---
+  // Hoare partition skanuje z obu stron jednocześnie i wykonuje ~3x mniej
+  // swapów niż Lomuto. Zwraca indeks j taki, że:
+  //   table[left..j] <= pivot  i  table[j+1..right] >= pivot
   static int partition(T *table, int left, int right) {
-    // --- Algorytm Median-Of-Three (Mediana z trzech) ---
-    // Wybieramy trzy elementy (pierwszy, środek i ostatni) i ustawiamy je tak,
-    // by na miejsce ostatniego wędrowała Mediana z najgorszych prób, a na
-    // miejsce pierwsze wartość najmniejsza. Zabezpiecza nas to przed tablicami
-    // z góry ułożonymi!
     int mid = left + (right - left) / 2;
 
-    if (table[mid] < table[left]) {
-      T tmp = table[left];
-      table[left] = table[mid];
-      table[mid] = tmp;
-    }
-    if (table[right] < table[left]) {
-      T tmp = table[left];
-      table[left] = table[right];
-      table[right] = tmp;
-    }
-    // Finalnie z pozostałych "dwóch" wyrzucamy ten mniejszy (medianę) do
-    // table[right] jako Pivot
-    if (table[mid] < table[right]) {
-      T tmp = table[mid];
-      table[mid] = table[right];
-      table[right] = tmp;
-    }
-    // Pivot jest teraz na ostatniej pozycji (table[right]), gotowy na stary
-    // podział Lomuto
-    T pivot = table[right];
+    // Median-of-Three: sortujemy table[left], table[mid], table[right]
+    if (table[mid] < table[left])
+      std::swap(table[left], table[mid]);
+    if (table[right] < table[left])
+      std::swap(table[left], table[right]);
+    if (table[right] < table[mid])
+      std::swap(table[mid], table[right]);
+
+    // Pivot = mediana (na pozycji mid)
+    // table[left] <= pivot <= table[right] — naturalne sentinele
+    T pivot = table[mid];
+
     int i = left - 1;
+    int j = right + 1;
 
-    for (int j = left; j < right; j++) {
-      if (table[j] <= pivot) {
-        i++;
-        T temp = table[i];
-        table[i] = table[j];
-        table[j] = temp;
-      }
+    for (;;) {
+      do { ++i; } while (table[i] < pivot);
+      do { --j; } while (table[j] > pivot);
+      if (i >= j)
+        return j;
+      std::swap(table[i], table[j]);
     }
-
-    T temp = table[i + 1];
-    table[i + 1] = table[right];
-    table[right] = temp;
-
-    return i + 1;
   }
 };
 

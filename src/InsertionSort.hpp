@@ -1,5 +1,6 @@
 #pragma once
 #include "ISort.hpp"
+#include <utility>
 
 template <typename T> class InsertionSort : public ISort<T> {
 public:
@@ -8,13 +9,13 @@ public:
       return;
 
     for (int i = 1; i < size; i++) {
-      T key = table[i];
+      T key = std::move(table[i]);
       int j = i - 1;
       while (j >= 0 && table[j] > key) {
-        table[j + 1] = table[j];
+        table[j + 1] = std::move(table[j]);
         j--;
       }
-      table[j + 1] = key;
+      table[j + 1] = std::move(key);
     }
   }
 
@@ -22,13 +23,13 @@ public:
 
   static void insertionSortInternal(T *table, int left, int right) {
     for (int i = left + 1; i <= right; i++) {
-      T key = table[i];
+      T key = std::move(table[i]);
       int j = i - 1;
       while (j >= left && table[j] > key) {
-        table[j + 1] = table[j];
+        table[j + 1] = std::move(table[j]);
         j--;
       }
-      table[j + 1] = key;
+      table[j + 1] = std::move(key);
     }
   }
 };

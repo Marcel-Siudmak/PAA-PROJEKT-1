@@ -3,7 +3,6 @@
 #include "ISort.hpp"
 #include "InsertionSort.hpp"
 #include "QuickSort.hpp"
-#include <cmath>
 
 template <typename T> class IntroSort : public ISort<T> {
 public:
@@ -11,7 +10,10 @@ public:
     if (size < 2)
       return;
 
-    int maxDepth = 2 * std::log2(size);
+    // __builtin_clz daje liczbę wiodących zer; floor(log2(n)) = 31 - clz(n)
+    // Szybsza operacja bitowa zamiast std::log2 (floating-point)
+    int log2n = (sizeof(unsigned) * 8 - 1) - __builtin_clz(static_cast<unsigned>(size));
+    int maxDepth = 2 * log2n;
     introSortInternal(table, 0, size - 1, maxDepth);
   }
 
@@ -33,7 +35,8 @@ private:
 
     int pivotIndex = QuickSort<T>::partition(table, left, right);
 
-    introSortInternal(table, left, pivotIndex - 1, maxDepth - 1);
+    // Hoare partition: podział na [left..pivotIndex] i [pivotIndex+1..right]
+    introSortInternal(table, left, pivotIndex, maxDepth - 1);
     introSortInternal(table, pivotIndex + 1, right, maxDepth - 1);
   }
 };
