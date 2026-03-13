@@ -1,6 +1,5 @@
 #pragma once
 #include "ISort.hpp"
-#include "InsertionSort.hpp"
 #include <algorithm>
 
 template <typename T> class MergeSort : public ISort<T> {
@@ -20,13 +19,6 @@ private:
   static void mergeSortInternal(T *table, int left, int right, T *buffer) {
     if (left >= right)
       return;
-
-    // Cutoff do InsertionSort dla małych podtablic — eliminuje overhead
-    // rekursji i merge'a, InsertionSort jest szybszy dla n < 16
-    if (right - left < 16) {
-      InsertionSort<T>::insertionSortInternal(table, left, right);
-      return;
-    }
 
     int middle = left + (right - left) / 2;
 
