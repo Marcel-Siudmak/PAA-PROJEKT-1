@@ -21,3 +21,4 @@
 
 # Ignoruj pliki .csv
 *.csv
+.DS_Store
