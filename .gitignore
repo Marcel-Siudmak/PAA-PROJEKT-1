@@ -1,6 +1,9 @@
 # Ignoruj folder z plikami binarnymi
 /build/
 
+# Ignoruj folder z skryptami
+/scripts/
+
 # Ignoruj folder z wynikami benchmarków
 /results/
 
@@ -21,4 +24,4 @@
 
 # Ignoruj pliki .csv
 *.csv
-.DS_Store
+/src/.DS_Store

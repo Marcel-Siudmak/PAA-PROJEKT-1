@@ -1,7 +1,7 @@
-#include "Menu.hpp"
+#include "Benchmarks.hpp"
 
 int main() {
-  Menu menu;
-  menu.run();
+  Benchmarks bench;
+  bench.runFullBenchmark();
   return 0;
 }
