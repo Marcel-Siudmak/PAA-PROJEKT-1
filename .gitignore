@@ -24,4 +24,8 @@
 
 # Ignoruj pliki .csv
 *.csv
-/src/.DS_Store
+
+#ignoruj pliki .DS_Store
+*.DS_Store
+.DS_Store
+src/.DS_Store

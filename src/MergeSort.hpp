@@ -25,8 +25,8 @@ private:
     mergeSortInternal(table, left, middle, buffer);
     mergeSortInternal(table, middle + 1, right, buffer);
 
-    // Pominięcie merge gdy dane już posortowane naturalnie — ogromne
-    // przyspieszenie na danych częściowo posortowanych
+    // Jeśli lewy i prawy fragment są już w kolejności (naturalnie posortowane),
+    // nie trzeba ich scalać — możemy zaoszczędzić czas.
     if (table[middle] <= table[middle + 1])
       return;
 
@@ -34,7 +34,8 @@ private:
   }
 
   static void mergeInternal(T *table, int left, int mid, int right, T *buffer) {
-    // Kopiujemy do bufora za pomocą std::copy (kompilator wektoryzuje)
+    // Skopiuj część tablicy, którą będziemy scalać, do bufora.
+    // Ta operacja jest zoptymalizowana przez kompilator.
     std::copy(table + left, table + right + 1, buffer + left);
 
     int i = left;
@@ -48,12 +49,13 @@ private:
         table[k++] = std::move(buffer[j++]);
     }
 
-    // Kopiujemy resztę lewej połówki (prawa już jest na miejscu w table)
+    // Skopiuj ewentualne pozostałe elementy z lewej połowy.
+    // Prawa połowa już znajduje się we właściwych miejscach w table.
     while (i <= mid)
       table[k++] = std::move(buffer[i++]);
 
-    // Reszta prawej połówki jest już na właściwych pozycjach w table
-    // — nie trzeba jej kopiować (j..right to oryginalne pozycje)
+    // Pozostałe elementy prawej połowy są już we właściwym miejscu,
+    // więc nie musimy ich przenosić ponownie.
   }
 };
 

@@ -1,84 +1,151 @@
-# PROJEKTOWANIE I ANALIZA ALGORYTMOW - PROJEKT 1
+# Projektowanie i Analiza Algorytmów (PAA) — Projekt 1
+## Porównanie Efektywności Algorytmów Sortowania
+
+Projekt zawiera implementacje i porównanie wydajności trzech algorytmów sortowania: **MergeSort**, **QuickSort** i **IntroSort** na różnych rozkładach danych (losowe, posortowane, częściowo posortowane, itp.).
 
 ## Spis treści
 
 - [Wymagania](#wymagania)
 - [Kompilacja i uruchomienie](#kompilacja-i-uruchomienie)
 - [Struktura projektu](#struktura-projektu)
-- [Testy](#testy)
+- [Moduły i komponenty](#moduły-i-komponenty)
+- [Procedura benchmarkowania](#procedura-benchmarkowania)
+- [Analiza wyników](#analiza-wyników)
+
+---
 
 ## 1. Wymagania
 
-* **Kompilator:** GCC 15+ / Clang 17+ (wymagane wsparcie dla C++20)
-* **System budowania:** CMake 3.10+
-* **System operacyjny:** macOS / Windows / Linux
+- **Kompilator:** GCC 9+ / Clang 10+ (C++20 lub wyżej)
+- **System budowania:** CMake 3.15+
+- **System operacyjny:** macOS / Linux / Windows
+- **Python:** 3.8+ (do generowania wykresów)
+
+---
 
 ## 2. Kompilacja i uruchomienie
 
-Aby zbudować projekt, wykonaj poniższe kroki w terminalu:
+### Budowanie projektu
 
-1. Stwórz folder budowania:
-   ```bash
-   mkdir build && cd build
-   ```
+```bash
+# Przejdź do katalogu projektu
+cd /Users/marcelsiudmak/Code/PAA-PROJEKT-1
 
-2. Skonfiguruj projekt za pomocą CMake:
-   ```bash
-   cmake ..
-   ```
+# Stwórz folder budowania
+mkdir -p build && cd build
 
-3. Skompiluj:
-   ```bash
-   cmake --build .
-   ```
+# Konfiguracja CMake
+cmake ..
 
-4. Uruchom program:
-   ```bash
-   ./mini_projekt_1
-   ```
+# Kompilacja
+cmake --build .
+```
+
+### Uruchomienie głównego programu
+
+```bash
+./paa_projekt_1
+```
+
+Program uruchomi interaktywne menu z opcjami:
+- **Testowanie ręczne** — wprowadzenie własnych danych
+- **Benchmarki** — automatyczne pomiary wydajności na różnych rozmiarach i rozkładach
+
+### Uruchomienie benchmarków i generowanie wykresów
+
+```bash
+# W katalogu /scripts
+cd ../scripts
+
+# Zainstaluj zależności Pythona (jednorazowo)
+pip install -r requirements.txt
+
+# Wygeneruj wykresy z wyników w /results
+python run_all_plots.py
+```
+
+Wykresy zostaną zapisane w: `../plots/`
+
+---
 
 ## 3. Struktura projektu
 
-```text
-├── src/
-│   ├── main.cpp
-│   ├── ISort.hpp
-│   ├── MergeSort.hpp
-│   ├── QuickSort.hpp
-│   ├── InsertionSort.hpp
-│   ├── HeapSort.hpp
-│   ├── IntroSort.hpp
-│   ├── Menu.hpp
-│   ├── Menu.cpp
-│   ├── ManualTester.hpp
-│   ├── ManualTester.cpp
-│   ├── Benchmarks.hpp
-│   ├── Benchmarks.cpp
-│   ├── DataHandler.hpp
-│   └── DataHandler.cpp
-├── results/
+```
+PAA-PROJEKT-1/
+├── src/                           # Kod źródłowy C++
+│   ├── main.cpp                   # Punkt wejścia aplikacji
+│   ├── ISort.hpp                  # Interfejs abstrakcyjny algorytmów
+│   ├── MergeSort.hpp              # Implementacja MergeSort
+│   ├── QuickSort.hpp              # Implementacja QuickSort
+│   ├── IntroSort.hpp              # Implementacja IntroSort (hybrydowy)
+│   ├── HeapSort.hpp               # Pomocniczy HeapSort
+│   ├── InsertionSort.hpp          # Pomocniczy InsertionSort
+│   ├── Benchmarks.hpp/.cpp        # Moduł benchmarkowania
+│   ├── DataHandler.hpp/.cpp       # Generator danych testowych
+│   ├── Menu.hpp/.cpp              # Interfejs użytkownika
+│   └── ManualTester.hpp/.cpp      # Tester manualny
+│
+├── scripts/                       # Skrypty Python do analizy
+│   ├── run_all_plots.py           # Generator wszystkich wykresów
+│   ├── plot.py                    # Wykresy podstawowe (random vs reverse)
+│   ├── plot_random_vs_reverse.py
+│   ├── plot_percent_sorted.py     # Wykresy dla różnych % sortowania
+│   ├── plot_partially_sorted.py
+│   ├── generate_tables.py         # Generator tabel CSV
+│   └── requirements.txt           # Zależności Pythona
+│
+├── build/                         # Folder budowania (CMake)
+│   ├── paa_projekt_1              # Plik wykonywalny
+│   ├── CMakeFiles/
+│   └── ...
+│
+├── data/                          # Dane testowe
+│   └── test.txt
+│
+├── results/                       # Wyniki benchmarków (CSV)
 │   ├── random.csv
 │   ├── reverse.csv
-│   └── ... 
-├── build/
-│   ├── paa_projekt_1
-│   └── ...
-├── CMakeLists.txt
-└── readme.md
+│   ├── sorted_25percent.csv
+│   ├── sorted_50percent.csv
+│   ├── sorted_75percent.csv
+│   ├── sorted_95percent.csv
+│   ├── sorted_99percent.csv
+│   └── sorted_99_7percent.csv
+│
+├── tables/                        # Tabele czasów (czasowo)
+│   ├── IntroSort_times.csv
+│   ├── MergeSort_times.csv
+│   └── QuickSort_times.csv
+│
+├── plots/                         # Wygenerowane wykresy
+│   ├── basic_distributions/       # Wykresy random vs reverse
+│   ├── percent_sorted/            # Wykresy dla % sortowania
+│   ├── partially_sorted/          # Wykresy dla różnych % presortowania
+│   └── random_vs_reverse/         # Porównanie dwóch rozkładów
+│
+├── CMakeLists.txt                 # Konfiguracja budowania
+├── readme.md                      # Ten plik
+└── .gitignore
 ```
 
 
-## 4. Szczegółowy Opis Plików i Modułów
+## 4. Moduły i komponenty
 
-### A. Abstrakcja i Interfejsy
+### 4.1 Interfejs abstrakcyjny
 
-#### `ISort.hpp` (Abstrakcja)
-Abstrakcyjna klasa bazowa (interfejs) wykorzystująca szablony (**templates**). Definiuje kontrakt dla wszystkich algorytmów sortowania poprzez czysto wirtualną metodę `sort()`. Pozwala to na polimorficzne zarządzanie różnymi algorytmami w module benchmarkowym.
+#### `ISort.hpp`
+Abstrakcyjna klasa bazowa definiująca kontrakt dla wszystkich algorytmów sortowania. Każda implementacja musi realizować:
+- `sort(T* table, int size)` — główna metoda sortowania
+- `getAlgorithmName()` — zwraca nazwę algorytmu
 
-### B. Algorytmy Sortowania (Moduły implementacyjne)
+Umożliwia polimorficzne zarządzanie różnymi algorytmami w module benchmarkowym.
 
-#### `MergeSort`
-`MergeSort.hpp` – Implementacja algorytmu sortowania przez scalanie bazująca na `ISort<T>`. Moduł realizuje strategię „dziel i zwyciężaj”, zapewniając stabilność sortowania i niezawodną złożoność $O(n \log n)$.
+---
+
+### 4.2 Algorytmy sortowania
+
+#### MergeSort.hpp
+**Sortowanie przez scalanie** — algorytm oparty na paradygmacie „dziel i zwyciężaj".
 
 #### `QuickSort`
 `QuickSort.hpp` – Implementacja sortowania szybkiego bazująca na `ISort<T>`. Algorytm wykorzystuje publiczny silnik partycjonowania tablicy względem elementu osiowego (pivot) wzbogacony o optymalizację Median-of-Three (Mediana z trzech).

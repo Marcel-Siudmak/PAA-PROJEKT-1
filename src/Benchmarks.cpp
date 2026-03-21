@@ -19,7 +19,7 @@ void Benchmarks::runFullBenchmark() {
   // Upewnijmy sie, ze folder results istnieje:
   fs::create_directory("../results");
   fs::create_directory(
-      "results"); // dla pewnosci jak jestesmy bezposrednio w root
+      "results");
 
   std::vector<int> sizes = {10000, 50000, 100000, 500000, 1000000};
   int numArraysToTest = 100;
@@ -96,7 +96,7 @@ void Benchmarks::testConfig(const std::string &configName, int numArraysToTest,
   for (int i = 0; i < numArraysToTest; i++) {
     // 1. Zamiast ładować wszystko na raz jak poprzednio, program generuje TYLKO
     // JEDNĄ tablicę naraz. Zwalnia i nadpisuje poprzednio zajmowaną pamięć
-    // dzięki czemu nigdy nie uśmiercimy w ten sposób RAMu.
+    // oszczędza RAM.
     std::vector<int> sampleArray;
     if (configName == "random") {
       sampleArray = DataHandler::generateRandom(arraySize);
@@ -181,12 +181,11 @@ void Benchmarks::testConfig(const std::string &configName, int numArraysToTest,
   }
 }
 
-// Implementacja bardzo szybkiej flagi sprawdzającej jedną pętlą do samego końca
-// N tablicy
+// Implementacja szybkiej flagi sprawdzającej jedną pętlą, czy tablica jest posortowana rosnąco
 bool Benchmarks::isSorted(const std::vector<int> &data) {
   for (size_t i = 1; i < data.size(); i++) {
     if (data[i - 1] > data[i]) {
-      return false; // Tablica nie jest posortowana rosnąco! Wpadka.
+      return false; // Tablica nie jest posortowana rosnąco
     }
   }
   return true;

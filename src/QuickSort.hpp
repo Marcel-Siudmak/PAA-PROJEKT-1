@@ -1,6 +1,5 @@
 #pragma once
 #include "ISort.hpp"
-#include "InsertionSort.hpp"
 #include <algorithm>
 
 template <typename T> class QuickSort : public ISort<T> {
@@ -19,12 +18,6 @@ private:
     // Tail-call elimination: sortujemy mniejszą partycję rekursyjnie,
     // a większą w pętli while. Ogranicza głębokość stosu do O(log n).
     while (left < right) {
-      // Cutoff do InsertionSort dla małych podtablic
-      if (right - left < 16) {
-        InsertionSort<T>::insertionSortInternal(table, left, right);
-        return;
-      }
-
       int p = partition(table, left, right);
 
       // Rekursja na mniejszą partycję, pętla na większą
